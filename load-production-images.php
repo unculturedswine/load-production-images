@@ -3,7 +3,7 @@
  * Plugin Name: Load Production Images
  * Plugin URI: https://plugins.joeljenkins.me
  * Description: Load images from your production server on local development or staging environments without downloading gigabytes of images. Supports multisite installations and includes automatic fallback to local images when production returns 404.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Kinda Useful Plugins
  * Author URI: https://plugins.joeljenkins.me
  * Requires at least: 5.0
@@ -94,6 +94,7 @@ class Load_Production_Images {
         // Admin hooks
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'settings_init'));
+        add_action('wp_ajax_lpi_dismiss_notice', array($this, 'dismiss_notice'));
 
         // Initialize image loading if conditions are met
         $this->maybe_init_image_loading();
@@ -205,15 +206,41 @@ class Load_Production_Images {
             return;
         }
 
+        // Check if user has dismissed this notice
+        $user_id = get_current_user_id();
+        if (get_user_meta($user_id, 'lpi_notice_dismissed', true)) {
+            return;
+        }
+
         $multisite_info = '';
         if (strpos($this->uploads_path, '/sites/') !== false) {
             $multisite_info = ' (Multisite: ' . esc_html($this->uploads_path) . ')';
         }
         ?>
-        <div class="notice notice-info is-dismissible" style="max-width: 600px;">
+        <div class="notice notice-info is-dismissible lpi-admin-notice" style="max-width: 600px;">
             <p><strong>Load Production Images:</strong> Active - Loading from <?php echo esc_html($this->live_site_url) . $multisite_info; ?></p>
         </div>
+        <script>
+        jQuery(document).ready(function($) {
+            $(document).on('click', '.lpi-admin-notice .notice-dismiss', function() {
+                $.post(ajaxurl, {
+                    action: 'lpi_dismiss_notice',
+                    _wpnonce: '<?php echo wp_create_nonce('lpi_dismiss_notice'); ?>'
+                });
+            });
+        });
+        </script>
         <?php
+    }
+
+    /**
+     * AJAX handler to dismiss the admin notice
+     */
+    public function dismiss_notice() {
+        check_ajax_referer('lpi_dismiss_notice');
+        $user_id = get_current_user_id();
+        update_user_meta($user_id, 'lpi_notice_dismissed', true);
+        wp_die();
     }
 
     /**
@@ -377,6 +404,10 @@ class Load_Production_Images {
      */
     public function sanitize_options($input) {
         $sanitized = array();
+
+        // Reset notice dismissal when settings change
+        $user_id = get_current_user_id();
+        delete_user_meta($user_id, 'lpi_notice_dismissed');
 
         // Sanitize enabled checkbox
         $sanitized['enabled'] = isset($input['enabled']) ? 1 : 0;
