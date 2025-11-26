@@ -1,10 +1,11 @@
 <?php
 /**
  * Plugin Name: Load Production Images
- * Plugin URI: https://joeljenkins.me/plugins
- * Description: Load images from your production server on local development or staging environments without having to download or sync gigabytes of images. <a href="/wp-admin/options-general.php?page=load-production-images">Manage Settings</a>
- * Version: 1.6.0
- * Author: Joel Jenkins
+ * Plugin URI: https://plugins.joeljenkins.me
+ * Description: Load images from your production server on local development or staging environments without downloading gigabytes of images. Supports multisite installations and includes automatic fallback to local images when production returns 404.
+ * Version: 1.0.0
+ * Author: Kinda Useful Plugins
+ * Author URI: https://plugins.joeljenkins.me
  * License: GPL v2 or later
  */
 
@@ -12,6 +13,14 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// Auto-updates from Kinda Useful Plugins
+require_once plugin_dir_path(__FILE__) . 'includes/class-plugin-updater.php';
+new Kinda_Useful_Plugin_Updater(
+    'https://plugins.joeljenkins.me',
+    __FILE__,
+    'load-production-images'
+);
 
 /**
  * Main plugin class
