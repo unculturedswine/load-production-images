@@ -3,7 +3,7 @@
  * Plugin Name: Load Production Images
  * Plugin URI: https://plugins.joeljenkins.me
  * Description: Load images from your production server on local development or staging environments without downloading gigabytes of images. Supports multisite installations and includes automatic fallback to local images when production returns 404.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Kinda Useful Plugins
  * Author URI: https://plugins.joeljenkins.me
  * Requires at least: 5.0
@@ -410,7 +410,7 @@ class Load_Production_Images {
         delete_user_meta($user_id, 'lpi_notice_dismissed');
 
         // Sanitize enabled checkbox
-        $sanitized['enabled'] = isset($input['enabled']) ? 1 : 0;
+        $sanitized['enabled'] = !empty($input['enabled']) ? 1 : 0;
 
         // Sanitize and validate URL
         if (isset($input['live_site_url'])) {
@@ -422,7 +422,7 @@ class Load_Production_Images {
         }
 
         // Sanitize multisite checkbox
-        $sanitized['is_multisite'] = isset($input['is_multisite']) ? 1 : 0;
+        $sanitized['is_multisite'] = !empty($input['is_multisite']) ? 1 : 0;
 
         // Sanitize multisite ID (must be positive integer)
         if (isset($input['multisite_id'])) {
@@ -432,7 +432,7 @@ class Load_Production_Images {
         }
 
         // Sanitize local fallback checkbox
-        $sanitized['enable_local_fallback'] = isset($input['enable_local_fallback']) ? 1 : 0;
+        $sanitized['enable_local_fallback'] = !empty($input['enable_local_fallback']) ? 1 : 0;
 
         return $sanitized;
     }
@@ -456,6 +456,7 @@ class Load_Production_Images {
         $enabled = isset($this->options['enabled']) ? $this->options['enabled'] : false;
         ?>
         <label class="lpi-toggle-switch">
+            <input type="hidden" name="lpi_options[enabled]" value="0" />
             <input type="checkbox" name="lpi_options[enabled]" value="1" <?php checked($enabled, 1); ?> id="lpi-enabled-checkbox" />
             <span class="lpi-slider"></span>
         </label>
@@ -540,6 +541,7 @@ class Load_Production_Images {
         $checked = isset($this->options['is_multisite']) ? $this->options['is_multisite'] : false;
         ?>
         <label>
+            <input type="hidden" name="lpi_options[is_multisite]" value="0" />
             <input type="checkbox" name="lpi_options[is_multisite]" value="1" <?php checked($checked, 1); ?> id="lpi-multisite-checkbox" />
             Check if your production server is a WordPress Multisite installation
         </label>
@@ -579,6 +581,7 @@ class Load_Production_Images {
         $checked = isset($this->options['enable_local_fallback']) ? $this->options['enable_local_fallback'] : false;
         ?>
         <label>
+            <input type="hidden" name="lpi_options[enable_local_fallback]" value="0" />
             <input type="checkbox" name="lpi_options[enable_local_fallback]" value="1" <?php checked($checked, 1); ?> />
             Fall back to local images if production returns 404
         </label>

@@ -8,8 +8,8 @@ Load images from your production server on local development or staging environm
 Contributors: Kinda Useful Plugins
 Tags: development, staging, images, media, localhost
 Requires at least: 5.0
-Tested up to: 6.4
-Stable tag: 1.0.1
+Tested up to: 6.7
+Stable tag: 1.0.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -52,6 +52,9 @@ Yes, check the multisite option and enter the site ID to load from the correct u
 Enable the "Local Fallback" option to automatically use local images when production returns 404.
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed checkbox settings not saving correctly when unchecked
 
 = 1.0.1 =
 * Fixed admin notice persistence - dismissing the notice now saves to user preferences
