@@ -3,7 +3,7 @@
  * Plugin Name: Load Production Images
  * Plugin URI: https://plugins.joeljenkins.me
  * Description: Load images from your production server on local development or staging environments without downloading gigabytes of images. Supports multisite installations and includes automatic fallback to local images when production returns 404.
- * Version: 1.0.2
+ * Version: 1.0.4
  * Author: Kinda Useful Plugins
  * Author URI: https://plugins.joeljenkins.me
  * Requires at least: 5.0
@@ -142,12 +142,29 @@ class Load_Production_Images {
     }
 
     /**
+     * Get production URL with scheme matching current request
+     * This prevents mixed content warnings when local site uses HTTPS
+     */
+    private function get_production_url() {
+        $production_url = $this->live_site_url . $this->uploads_path;
+
+        // Match the scheme to the current request to avoid mixed content warnings
+        if (is_ssl()) {
+            $production_url = preg_replace('/^http:/', 'https:', $production_url);
+        } else {
+            $production_url = preg_replace('/^https:/', 'http:', $production_url);
+        }
+
+        return $production_url;
+    }
+
+    /**
      * Replace local upload URL with production URL
      */
     private function replace_upload_url($url) {
         return str_replace(
             $this->current_site_url . '/wp-content/uploads',
-            $this->live_site_url . $this->uploads_path,
+            $this->get_production_url(),
             $url
         );
     }
@@ -156,7 +173,7 @@ class Load_Production_Images {
      * Filter upload directory
      */
     public function filter_upload_dir($uploads) {
-        $uploads['baseurl'] = $this->live_site_url . $this->uploads_path;
+        $uploads['baseurl'] = $this->get_production_url();
         $uploads['url'] = $this->replace_upload_url($uploads['url']);
         return $uploads;
     }
@@ -265,7 +282,7 @@ class Load_Production_Images {
         ?>
         <script>
         (function() {
-            var prodUrl = <?php echo wp_json_encode($this->live_site_url . $this->uploads_path); ?>;
+            var prodUrl = <?php echo wp_json_encode($this->get_production_url()); ?>;
             var localUrl = <?php echo wp_json_encode($this->current_site_url . '/wp-content/uploads'); ?>;
 
             function handleImageError(img) {

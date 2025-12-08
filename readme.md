@@ -9,7 +9,7 @@ Contributors: Kinda Useful Plugins
 Tags: development, staging, images, media, localhost
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.0.2
+Stable tag: 1.0.4
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -52,6 +52,12 @@ Yes, check the multisite option and enter the site ID to load from the correct u
 Enable the "Local Fallback" option to automatically use local images when production returns 404.
 
 == Changelog ==
+
+= 1.0.4 =
+* Fixed mixed content warnings when local site uses HTTPS but production URL was entered with HTTP
+
+= 1.0.3 =
+* Auto-update support
 
 = 1.0.2 =
 * Fixed checkbox settings not saving correctly when unchecked
